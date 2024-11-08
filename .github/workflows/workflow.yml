@@ -2,11 +2,13 @@
 name: 'Terraform'
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "**" ]
-
+    branches:
+      - '**'
+  push:
+    branches:
+      - main 
+    
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -54,6 +56,7 @@ jobs:
     - name: Terraform Plan
       run: terraform plan 
       working-directory: ${{ env.ROOT_PATH }}
+      if: github.event_name == 'pull_request'
 
 ##terraform apply job only if terraform plan gets run successfully.
   terraform_apply:
@@ -91,7 +94,8 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform apply
-      run: terraform apply --auto-approve 
+      run: terraform apply --auto-approve
+      if: github.event_name == 'push' 
       working-directory: ${{ env.ROOT_PATH }}
 
 
